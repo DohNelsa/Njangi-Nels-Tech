@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Send Group Email{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8 col-xl-6">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0"><i class="bi bi-envelope-fill"></i> Send Group Email</h4>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    Send a notification email to selected members. Leave the recipient list empty to message all active members.
+                </p>
+                <form method="post">
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.recipients.id_for_label }}">
+                            <i class="bi bi-people"></i> Recipients
+                        </label>
+                        {{ form.recipients }}
+                        <small class="text-muted">{{ form.fields.recipients.help_text }}</small>
+                        {% for error in form.recipients.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="form-check form-switch mb-3">
+                        {{ form.include_pending }}
+                        <label class="form-check-label" for="{{ form.include_pending.id_for_label }}">
+                            {{ form.include_pending.label }}
+                        </label>
+                        {% for error in form.include_pending.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.subject.id_for_label }}">
+                            <i class="bi bi-chat-left-text"></i> Subject
+                        </label>
+                        {{ form.subject }}
+                        {% for error in form.subject.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label" for="{{ form.message.id_for_label }}">
+                            <i class="bi bi-journal-text"></i> Message
+                        </label>
+                        {{ form.message }}
+                        {% for error in form.message.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="d-grid gap-2 d-sm-flex justify-content-sm-end">
+                        <a href="{% url 'members:list' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Send Email
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

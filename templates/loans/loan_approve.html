@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Review Loan - {{ loan.member.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-check-circle"></i> Review Loan Request</h2>
+        <p class="text-muted">{{ loan.member.name }} - {{ loan.amount }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'loans:detail' loan.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Loan Details
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Loan Request Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Member:</strong></div>
+                    <div class="col-sm-8">{{ loan.member.name }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Loan Amount:</strong></div>
+                    <div class="col-sm-8"><strong>{{ loan.amount }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Interest Rate:</strong></div>
+                    <div class="col-sm-8">{{ loan.interest_rate }}%</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Total Amount (with interest):</strong></div>
+                    <div class="col-sm-8"><strong class="text-primary">{{ loan.get_total_amount|floatformat:2 }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Purpose:</strong></div>
+                    <div class="col-sm-8">{{ loan.purpose|linebreaks }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Requested Date:</strong></div>
+                    <div class="col-sm-8">{{ loan.requested_date|date:"F d, Y" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Due Date:</strong></div>
+                    <div class="col-sm-8">{{ loan.due_date|date:"F d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-clipboard-check"></i> Approve or Reject Loan</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.status.id_for_label }}" class="form-label">
+                            <i class="bi bi-check-circle"></i> Decision <span class="text-danger">*</span>
+                        </label>
+                        {{ form.status }}
+                        <small class="form-text text-muted">Select whether to approve or reject this loan</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <i class="bi bi-sticky"></i> Notes (Optional)
+                        </label>
+                        {{ form.notes }}
+                        <small class="form-text text-muted">Add any notes about your decision</small>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Note:</strong> If approved, the loan will be activated and the member can start making repayments.
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'loans:detail' loan.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Submit Decision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5><i class="bi bi-info-circle"></i> Member Information</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Name:</strong> {{ loan.member.name }}</p>
+                <p><strong>Role:</strong> {{ loan.member.get_role_display }}</p>
+                <p><strong>Current Balance:</strong> 
+                    <span class="text-{% if loan.member.get_current_balance >= 0 %}success{% else %}danger{% endif %}">
+                        {{ loan.member.get_current_balance|floatformat:2 }}
+                    </span>
+                </p>
+                <hr>
+                <a href="{% url 'members:detail' loan.member.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-eye"></i> View Member Profile
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

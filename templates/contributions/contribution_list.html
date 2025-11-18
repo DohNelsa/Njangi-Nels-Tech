@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Contributions - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="bi bi-cash-stack"></i> Contributions</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        {% if user.is_staff %}
+            <a href="{% url 'contributions:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Record Contribution
+            </a>
+        {% elif user.member_profile.is_admin %}
+            <a href="{% url 'contributions:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Record Contribution
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-4">
+                <label for="member" class="form-label">Filter by Member</label>
+                <select class="form-control" id="member" name="member">
+                    <option value="">All Members</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}" {% if member_filter == member.id|stringformat:"s" %}selected{% endif %}>
+                            {{ member.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date_from" class="form-label">From Date</label>
+                <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+            </div>
+            <div class="col-md-3">
+                <label for="date_to" class="form-label">To Date</label>
+                <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-filter"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Total Summary -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="row gy-3 text-center">
+            <div class="col-12 col-md-4 col-xl-3">
+                <div class="border rounded p-3 h-100 bg-light">
+                    <h6 class="text-muted mb-1">Total Contributions</h6>
+                    <p class="fs-5 fw-bold text-success">{{ total|floatformat:2 }}</p>
+                </div>
+            </div>
+            {% for item in category_breakdown %}
+                <div class="col-12 col-md-4 col-xl-3">
+                    <div class="border rounded p-3 h-100">
+                        <h6 class="text-muted mb-1">{{ item.label }}</h6>
+                        <p class="fs-5 fw-bold text-primary">{{ item.total|floatformat:2 }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+            <div class="col-12 col-md-4 col-xl-3">
+                <div class="border rounded p-3 h-100">
+                    <h6 class="text-muted mb-1">Approved Expenses</h6>
+                    <p class="fs-5 fw-bold text-danger">{{ expenses_total|floatformat:2 }}</p>
+                </div>
+            </div>
+            <div class="col-12 col-md-4 col-xl-3">
+                <div class="border rounded p-3 h-100 bg-light">
+                    <h6 class="text-muted mb-1">Net Balance</h6>
+                    <p class="fs-5 fw-bold {% if net_total >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ net_total|floatformat:2 }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="text-end mt-3">
+            <a href="{% url 'contributions:yearly_statement' %}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-calendar3"></i> Yearly Account Statement
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Contributions List -->
+<div class="card">
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Recorded By</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contribution in page_obj %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'members:detail' contribution.member.pk %}">
+                                        {{ contribution.member.name }}
+                                    </a>
+                                </td>
+                                <td><strong>{{ contribution.amount }}</strong></td>
+                                <td>{{ contribution.date|date:"M d, Y" }}</td>
+                                <td>{{ contribution.description|truncatewords:10|default:"No description" }}</td>
+                                <td>{{ contribution.created_by.username|default:"System" }}</td>
+                                <td>
+                                    <a href="{% url 'contributions:account_balance' contribution.member.pk %}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-person"></i> View Account
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if member_filter %}&member={{ member_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> No contributions found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

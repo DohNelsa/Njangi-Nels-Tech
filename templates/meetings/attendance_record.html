@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Attendance - {{ meeting.title }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-clipboard-check"></i> Record Attendance</h2>
+        <p class="text-muted">{{ meeting.title }} - {{ meeting.date|date:"F d, Y H:i" }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'meetings:detail' meeting.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Meeting
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="bi bi-people"></i> Select Present Members
+                        </label>
+                        <div class="row">
+                            {% for member in all_members %}
+                                <div class="col-md-4 col-sm-6 mb-2">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" 
+                                               name="present_members" value="{{ member.id }}" 
+                                               id="member_{{ member.id }}"
+                                               {% if member in form.present_members.value %}checked{% endif %}>
+                                        <label class="form-check-label" for="member_{{ member.id }}">
+                                            {{ member.name }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        {% if not all_members %}
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle"></i> No active members found.
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <i class="bi bi-sticky"></i> Notes (Optional)
+                        </label>
+                        {{ form.notes }}
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Note:</strong> Check the boxes for members who are present. Unchecked members will be marked as absent.
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'meetings:detail' meeting.pk %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Save Attendance
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

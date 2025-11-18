@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Request Withdrawal - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-arrow-down-circle"></i> Request Withdrawal</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'contributions:withdrawal_list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.member.id_for_label }}" class="form-label">
+                            <i class="bi bi-person"></i> Member <span class="text-danger">*</span>
+                        </label>
+                        {{ form.member }}
+                        <small class="form-text text-muted">Current balance will be checked before approval</small>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">
+                                <i class="bi bi-cash"></i> Amount <span class="text-danger">*</span>
+                            </label>
+                            {{ form.amount }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar"></i> Date <span class="text-danger">*</span>
+                            </label>
+                            {{ form.date }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.reason.id_for_label }}" class="form-label">
+                            <i class="bi bi-file-text"></i> Reason <span class="text-danger">*</span>
+                        </label>
+                        {{ form.reason }}
+                        <small class="form-text text-muted">Please provide a reason for this withdrawal</small>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Note:</strong> Your withdrawal request will be reviewed by administrators. You will be notified once it's approved or rejected.
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'contributions:withdrawal_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Submit Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Withdrawal Process</h5>
+            </div>
+            <div class="card-body">
+                <p class="small">
+                    <strong>Process:</strong>
+                </p>
+                <ol class="small">
+                    <li>Submit withdrawal request</li>
+                    <li>Administrator reviews request</li>
+                    <li>Withdrawal approved or rejected</li>
+                    <li>If approved, amount is deducted from balance</li>
+                </ol>
+                <hr>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Fields marked with <span class="text-danger">*</span> are required.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Announcements - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="bi bi-bullhorn"></i> Announcements</h2>
+    </div>
+    <div class="col-md-6 text-end">
+        {% if user.is_staff or user.member_profile.is_admin %}
+            <a href="{% url 'announcements:create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> New Announcement
+            </a>
+        {% endif %}
+        <a href="{% url 'announcements:feed' %}" class="btn btn-outline-info">
+            <i class="bi bi-rss"></i> Community Updates
+        </a>
+    </div>
+</div>
+
+<!-- Search -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-10">
+                <label for="search" class="form-label">Search Announcements</label>
+                <input type="text" class="form-control" id="search" name="search" 
+                       value="{{ search_query }}" placeholder="Search by title or content...">
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-search"></i> Search
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Announcements List -->
+<div class="card">
+    <div class="card-body">
+        {% if page_obj %}
+            {% for announcement in page_obj %}
+                <div class="card mb-3 {% if announcement.is_pinned %}border-warning{% endif %}">
+                    <div class="card-header {% if announcement.is_pinned %}bg-warning{% endif %}">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-0">
+                                    {% if announcement.is_pinned %}
+                                        <i class="bi bi-pin-angle-fill"></i>
+                                    {% endif %}
+                                    {{ announcement.title }}
+                                </h5>
+                            </div>
+                            <div>
+                                <span class="badge bg-{% if announcement.priority == 'urgent' %}danger{% elif announcement.priority == 'high' %}warning{% elif announcement.priority == 'normal' %}info{% else %}secondary{% endif %}">
+                                    {{ announcement.get_priority_display }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ announcement.content|truncatewords:50|linebreaks }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ announcement.created_by.username|default:"System" }}
+                                <i class="bi bi-clock ms-2"></i> {{ announcement.created_at|timesince }} ago
+                            </small>
+                            <a href="{% url 'announcements:detail' announcement.pk %}" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i> Read More
+                            </a>
+                        </div>
+                        {% if announcement.expires_at %}
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-calendar-x"></i> Expires: {{ announcement.expires_at|date:"F d, Y H:i" }}
+                            </small>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> No announcements found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

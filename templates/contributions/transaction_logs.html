@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Transaction Logs - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-list-check"></i> Transaction Logs</h2>
+        <p class="text-muted">Complete audit trail of all transactions</p>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <label for="member" class="form-label">Filter by Member</label>
+                <select class="form-control" id="member" name="member">
+                    <option value="">All Members</option>
+                    {% for member in members %}
+                        <option value="{{ member.id }}" {% if member_filter == member.id|stringformat:"s" %}selected{% endif %}>
+                            {{ member.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label for="type" class="form-label">Filter by Type</label>
+                <select class="form-control" id="type" name="type">
+                    <option value="">All Types</option>
+                    <option value="contribution" {% if type_filter == 'contribution' %}selected{% endif %}>Contribution</option>
+                    <option value="withdrawal" {% if type_filter == 'withdrawal' %}selected{% endif %}>Withdrawal</option>
+                    <option value="loan_granted" {% if type_filter == 'loan_granted' %}selected{% endif %}>Loan Granted</option>
+                    <option value="loan_repayment" {% if type_filter == 'loan_repayment' %}selected{% endif %}>Loan Repayment</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-filter"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Transaction Logs -->
+<div class="card">
+    <div class="card-body">
+        {% if page_obj %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Type</th>
+                            <th>Member</th>
+                            <th>Amount</th>
+                            <th>Description</th>
+                            <th>Recorded By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in page_obj %}
+                            <tr>
+                                <td>{{ log.created_at|date:"M d, Y H:i" }}</td>
+                                <td>
+                                    <span class="badge bg-{% if log.transaction_type == 'contribution' %}success{% elif log.transaction_type == 'withdrawal' %}danger{% elif log.transaction_type == 'loan_granted' %}info{% else %}warning{% endif %}">
+                                        {{ log.get_transaction_type_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if log.member %}
+                                        <a href="{% url 'members:detail' log.member.pk %}">
+                                            {{ log.member.name }}
+                                        </a>
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <strong class="text-{% if log.transaction_type == 'contribution' %}success{% elif log.transaction_type == 'withdrawal' %}danger{% else %}info{% endif %}">
+                                        {{ log.amount }}
+                                    </strong>
+                                </td>
+                                <td>{{ log.description|truncatewords:15|default:"No description" }}</td>
+                                <td>{{ log.created_by.username|default:"System" }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if member_filter %}&member={{ member_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if member_filter %}&member={{ member_filter }}{% endif %}{% if type_filter %}&type={{ type_filter }}{% endif %}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> No transaction logs found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

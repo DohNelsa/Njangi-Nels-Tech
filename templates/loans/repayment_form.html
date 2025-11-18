@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}Record Loan Repayment{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-cash-stack"></i> Record Loan Repayment</h2>
+        {% if loan %}
+            <p class="text-muted">Loan: {{ loan.member.name }} - {{ loan.amount }}</p>
+        {% endif %}
+    </div>
+    <div class="col-md-4 text-end">
+        {% if loan %}
+            <a href="{% url 'loans:detail' loan.pk %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Loan
+            </a>
+        {% else %}
+            <a href="{% url 'loans:list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to List
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                {% if loan %}
+                    <div class="alert alert-info mb-4">
+                        <h6><i class="bi bi-info-circle"></i> Loan Information</h6>
+                        <p class="mb-1"><strong>Total Amount:</strong> {{ loan.get_total_amount|floatformat:2 }}</p>
+                        <p class="mb-1"><strong>Amount Paid:</strong> {{ loan.get_paid_amount|floatformat:2 }}</p>
+                        <p class="mb-0"><strong>Remaining Balance:</strong> 
+                            <span class="text-{% if loan.get_remaining_balance > 0 %}danger{% else %}success{% endif %}">
+                                {{ loan.get_remaining_balance|floatformat:2 }}
+                            </span>
+                        </p>
+                    </div>
+                {% endif %}
+                
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.loan.id_for_label }}" class="form-label">
+                            <i class="bi bi-bank"></i> Loan <span class="text-danger">*</span>
+                        </label>
+                        {{ form.loan }}
+                        {% if loan %}
+                            <small class="form-text text-muted">Repayment for: {{ loan.member.name }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.amount.id_for_label }}" class="form-label">
+                            <i class="bi bi-cash"></i> Payment Amount <span class="text-danger">*</span>
+                        </label>
+                        {{ form.amount }}
+                        {% if loan %}
+                            <small class="form-text text-muted">Maximum: {{ loan.get_remaining_balance|floatformat:2 }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.payment_date.id_for_label }}" class="form-label">
+                            <i class="bi bi-calendar"></i> Payment Date <span class="text-danger">*</span>
+                        </label>
+                        {{ form.payment_date }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">
+                            <i class="bi bi-sticky"></i> Notes (Optional)
+                        </label>
+                        {{ form.notes }}
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        {% if loan %}
+                            <a href="{% url 'loans:detail' loan.pk %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        {% else %}
+                            <a href="{% url 'loans:list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Record Repayment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="small">
+                    <strong>Repayment Process:</strong>
+                </p>
+                <ul class="small">
+                    <li>Record the payment amount</li>
+                    <li>Specify the payment date</li>
+                    <li>Add optional notes</li>
+                    <li>Loan will be marked as completed when fully paid</li>
+                </ul>
+                <hr>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Fields marked with <span class="text-danger">*</span> are required.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if meeting %}Edit{% else %}Create{% endif %} Meeting - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-calendar-plus"></i> {% if meeting %}Edit Meeting{% else %}Schedule New Meeting{% endif %}</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'meetings:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                            <i class="bi bi-card-heading"></i> Meeting Title <span class="text-danger">*</span>
+                        </label>
+                        {{ form.title }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.date.id_for_label }}" class="form-label">
+                            <i class="bi bi-calendar"></i> Date & Time <span class="text-danger">*</span>
+                        </label>
+                        {{ form.date }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.location.id_for_label }}" class="form-label">
+                            <i class="bi bi-geo-alt"></i> Location
+                        </label>
+                        {{ form.location }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.agenda.id_for_label }}" class="form-label">
+                            <i class="bi bi-list-ul"></i> Agenda <span class="text-danger">*</span>
+                        </label>
+                        {{ form.agenda }}
+                        <small class="form-text text-muted">Enter the meeting agenda items</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.minutes.id_for_label }}" class="form-label">
+                            <i class="bi bi-file-text"></i> Meeting Minutes
+                        </label>
+                        {{ form.minutes }}
+                        <small class="form-text text-muted">Add meeting minutes after the meeting</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_completed }}
+                            <label class="form-check-label" for="{{ form.is_completed.id_for_label }}">
+                                Mark as Completed
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'meetings:list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> {% if meeting %}Update{% else %}Create{% endif %} Meeting
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Information</h5>
+            </div>
+            <div class="card-body">
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Fields marked with <span class="text-danger">*</span> are required.
+                </p>
+                <hr>
+                <p class="small">
+                    <strong>Tip:</strong> After creating the meeting, you can record attendance and add meeting minutes.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

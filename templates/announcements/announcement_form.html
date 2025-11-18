@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if announcement %}Edit{% else %}Create{% endif %} Announcement - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-bullhorn"></i> {% if announcement %}Edit Announcement{% else %}Create New Announcement{% endif %}</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'announcements:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                            <i class="bi bi-card-heading"></i> Title <span class="text-danger">*</span>
+                        </label>
+                        {{ form.title }}
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.priority.id_for_label }}" class="form-label">
+                                <i class="bi bi-exclamation-triangle"></i> Priority <span class="text-danger">*</span>
+                            </label>
+                            {{ form.priority }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.expires_at.id_for_label }}" class="form-label">
+                                <i class="bi bi-calendar-x"></i> Expires At (Optional)
+                            </label>
+                            {{ form.expires_at }}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.content.id_for_label }}" class="form-label">
+                            <i class="bi bi-file-text"></i> Content <span class="text-danger">*</span>
+                        </label>
+                        {{ form.content }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_pinned }}
+                            <label class="form-check-label" for="{{ form.is_pinned.id_for_label }}">
+                                Pin this announcement (appears at top of list)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.is_active }}
+                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">
+                                Active (visible to members)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{% url 'announcements:list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> {% if announcement %}Update{% else %}Create{% endif %} Announcement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Priority Levels</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    <li><span class="badge bg-danger">Urgent</span> - Requires immediate attention</li>
+                    <li class="mt-2"><span class="badge bg-warning">High</span> - Important information</li>
+                    <li class="mt-2"><span class="badge bg-info">Normal</span> - Standard announcement</li>
+                    <li class="mt-2"><span class="badge bg-secondary">Low</span> - General information</li>
+                </ul>
+                <hr>
+                <p class="small text-muted mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Fields marked with <span class="text-danger">*</span> are required.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

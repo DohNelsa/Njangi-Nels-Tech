@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4><i class="bi bi-person-plus"></i> Register as Member</h4>
+                <p class="text-muted mb-0">Join the Ngangi Platform Community</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.name.id_for_label }}" class="form-label">
+                            <i class="bi bi-card-heading"></i> Full Name <span class="text-danger">*</span>
+                        </label>
+                        {{ form.name }}
+                        {% if form.name.help_text %}
+                            <small class="form-text text-muted">{{ form.name.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.username.id_for_label }}" class="form-label">
+                            <i class="bi bi-person"></i> Username <span class="text-danger">*</span>
+                        </label>
+                        {{ form.username }}
+                        {% if form.username.help_text %}
+                            <small class="form-text text-muted">{{ form.username.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.email.id_for_label }}" class="form-label">
+                            <i class="bi bi-envelope"></i> Email Address <span class="text-danger">*</span>
+                        </label>
+                        {{ form.email }}
+                        {% if form.email.help_text %}
+                            <small class="form-text text-muted">{{ form.email.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.phone.id_for_label }}" class="form-label">
+                            <i class="bi bi-telephone"></i> Phone Number
+                        </label>
+                        {{ form.phone }}
+                        <small class="form-text text-muted">Format: +1234567890 (optional)</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.address.id_for_label }}" class="form-label">
+                            <i class="bi bi-geo-alt"></i> Address
+                        </label>
+                        {{ form.address }}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.password1.id_for_label }}" class="form-label">
+                            <i class="bi bi-lock"></i> Password
+                        </label>
+                        {{ form.password1 }}
+                        {% if form.password1.help_text %}
+                            <small class="form-text text-muted">{{ form.password1.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.password2.id_for_label }}" class="form-label">
+                            <i class="bi bi-lock-fill"></i> Confirm Password
+                        </label>
+                        {{ form.password2 }}
+                        {% if form.password2.help_text %}
+                            <small class="form-text text-muted">{{ form.password2.help_text }}</small>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-hourglass-split"></i>
+                        <strong>Registration review required.</strong> Once you submit this form, an administrator will review your details. 
+                        You’ll receive access after approval and activation.
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="bi bi-person-plus"></i> Create Account
+                        </button>
+                    </div>
+                </form>
+                
+                <hr>
+                
+                <div class="text-center">
+                    <p class="mb-0">
+                        Already have an account? 
+                        <a href="{% url 'login' %}" class="text-decoration-none">
+                            <i class="bi bi-box-arrow-in-right"></i> Login here
+                        </a>
+                    </p>
+                    <p class="mb-0 mt-2">
+                        <a href="{% url 'members:list' %}" class="text-decoration-none">
+                            <i class="bi bi-arrow-left"></i> Back to Members List
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    }
+    
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .alert-info {
+        background-color: #e7f3ff;
+        border-color: #b3d9ff;
+        color: #004085;
+    }
+</style>
+{% endblock %}
+

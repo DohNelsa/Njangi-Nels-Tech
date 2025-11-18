@@ -1,0 +1,251 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Management - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <h2><i class="bi bi-gear"></i> Admin Management</h2>
+        <p class="text-muted">Manage all platform functionalities</p>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+<div class="row mb-4">
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card success">
+            <p class="stat-label">Total Savings</p>
+            <p class="stat-value">{{ total_savings|floatformat:2 }}</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card info">
+            <p class="stat-label">Total Members</p>
+            <p class="stat-value">{{ total_members }}</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card">
+            <p class="stat-label">Active Loans</p>
+            <p class="stat-value">{{ active_loans }}</p>
+        </div>
+    </div>
+    <div class="col-md-3 col-sm-6 mb-3">
+        <div class="stat-card warning">
+            <p class="stat-label">Pending Approvals</p>
+            <p class="stat-value">{{ pending_withdrawals|add:pending_loans }}</p>
+        </div>
+    </div>
+</div>
+
+<!-- Main Management Sections -->
+<div class="row">
+    <!-- Member Management -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-people"></i> Member Management</h5>
+            </div>
+            <div class="card-body">
+                <p>Manage community members, roles, and profiles</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'members:list' %}" class="btn btn-primary">
+                        <i class="bi bi-list"></i> View All Members
+                    </a>
+                    <a href="{% url 'members:create' %}" class="btn btn-outline-primary">
+                        <i class="bi bi-person-plus"></i> Add New Member
+                    </a>
+                    <a href="{% url 'members:group_email' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-envelope"></i> Send Group Email
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contributions Management -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Contributions Management</h5>
+            </div>
+            <div class="card-body">
+                <p>Record contributions, manage withdrawals, and view transactions</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'contributions:list' %}" class="btn btn-success">
+                        <i class="bi bi-list"></i> View Contributions
+                    </a>
+                    <a href="{% url 'contributions:create' %}" class="btn btn-outline-success">
+                        <i class="bi bi-plus-circle"></i> Record Contribution
+                    </a>
+                    <a href="{% url 'contributions:withdrawal_list' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-arrow-down-circle"></i> Review Withdrawals
+                    </a>
+                    <a href="{% url 'contributions:transaction_logs' %}" class="btn btn-outline-info">
+                        <i class="bi bi-list-check"></i> Transaction Logs
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Media Gallery Management -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-images"></i> Media Gallery Management</h5>
+            </div>
+            <div class="card-body">
+                <p>Upload images and videos for public viewing</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'upload_media' %}" class="btn btn-info">
+                        <i class="bi bi-cloud-upload"></i> Upload Media
+                    </a>
+                    <a href="{% url 'gallery:gallery' %}" class="btn btn-outline-info">
+                        <i class="bi bi-images"></i> View Gallery
+                    </a>
+                </div>
+                <hr>
+                <div class="row text-center">
+                    <div class="col-4">
+                        <strong>{{ total_media }}</strong>
+                        <p class="small mb-0">Total Media</p>
+                    </div>
+                    <div class="col-4">
+                        <strong>{{ image_count }}</strong>
+                        <p class="small mb-0">Images</p>
+                    </div>
+                    <div class="col-4">
+                        <strong>{{ video_count }}</strong>
+                        <p class="small mb-0">Videos</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Meeting Management -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Meeting Management</h5>
+            </div>
+            <div class="card-body">
+                <p>Schedule meetings, manage agendas, and track attendance</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'meetings:list' %}" class="btn btn-warning">
+                        <i class="bi bi-list"></i> View Meetings
+                    </a>
+                    <a href="{% url 'meetings:create' %}" class="btn btn-outline-warning">
+                        <i class="bi bi-plus-circle"></i> Schedule Meeting
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Announcements Management -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-secondary text-white">
+                <h5 class="mb-0"><i class="bi bi-bullhorn"></i> Announcements Management</h5>
+            </div>
+            <div class="card-body">
+                <p>Create announcements and community updates</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'announcements:list' %}" class="btn btn-secondary">
+                        <i class="bi bi-list"></i> View Announcements
+                    </a>
+                    <a href="{% url 'announcements:create' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-plus-circle"></i> New Announcement
+                    </a>
+                    <a href="{% url 'announcements:feed' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-rss"></i> Community Updates
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loans Management -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-bank"></i> Loans Management</h5>
+            </div>
+            <div class="card-body">
+                <p>Review loan requests, approve loans, and track repayments</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'loans:list' %}" class="btn btn-danger">
+                        <i class="bi bi-list"></i> View Loans
+                    </a>
+                    <a href="{% url 'loans:list' %}?status=pending" class="btn btn-outline-danger">
+                        <i class="bi bi-exclamation-triangle"></i> Pending Approvals ({{ pending_loans }})
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reports & Exports -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-text"></i> Reports & Exports</h5>
+            </div>
+            <div class="card-body">
+                <p>Generate and export reports for transparency</p>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'dashboard:export_contributions' %}" class="btn btn-dark">
+                        <i class="bi bi-download"></i> Export Contributions
+                    </a>
+                    <a href="{% url 'dashboard:export_members' %}" class="btn btn-outline-dark">
+                        <i class="bi bi-download"></i> Export Members
+                    </a>
+                    <a href="{% url 'dashboard:export_transactions' %}" class="btn btn-outline-dark">
+                        <i class="bi bi-download"></i> Export Transactions
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Approvals -->
+    {% if pending_withdrawals > 0 or pending_loans > 0 %}
+    <div class="col-12 mb-4">
+        <div class="card shadow-sm border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Pending Approvals</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    {% if pending_withdrawals > 0 %}
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-arrow-down-circle"></i> Withdrawal Requests</h6>
+                            <p class="mb-2"><strong>{{ pending_withdrawals }}</strong> withdrawal requests pending approval</p>
+                            <a href="{% url 'contributions:withdrawal_list' %}?status=pending" class="btn btn-sm btn-warning">
+                                Review Now
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if pending_loans > 0 %}
+                    <div class="col-md-6">
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-bank"></i> Loan Requests</h6>
+                            <p class="mb-2"><strong>{{ pending_loans }}</strong> loan requests pending approval</p>
+                            <a href="{% url 'loans:list' %}?status=pending" class="btn btn-sm btn-warning">
+                                Review Now
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

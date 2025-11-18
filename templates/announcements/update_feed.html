@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Community Updates - Ngangi Platform{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-6">
+        <h2><i class="bi bi-rss"></i> Community Updates</h2>
+        <p class="text-muted">Latest updates and summaries from the community</p>
+    </div>
+    <div class="col-md-6 text-end">
+        {% if user.is_staff or user.member_profile.is_admin %}
+            <a href="{% url 'announcements:update_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> New Update
+            </a>
+        {% endif %}
+        <a href="{% url 'announcements:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-bullhorn"></i> Announcements
+        </a>
+    </div>
+</div>
+
+<!-- Filter -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-8">
+                <label for="type" class="form-label">Filter by Type</label>
+                <select class="form-control" id="type" name="type">
+                    <option value="">All Updates</option>
+                    <option value="savings_status" {% if type_filter == 'savings_status' %}selected{% endif %}>Savings Status</option>
+                    <option value="meeting_summary" {% if type_filter == 'meeting_summary' %}selected{% endif %}>Meeting Summary</option>
+                    <option value="general" {% if type_filter == 'general' %}selected{% endif %}>General Update</option>
+                    <option value="reminder" {% if type_filter == 'reminder' %}selected{% endif %}>Reminder</option>
+                </select>
+            </div>
+            <div class="col-md-4 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-filter"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Updates Feed -->
+<div class="card">
+    <div class="card-body">
+        {% if page_obj %}
+            {% for update in page_obj %}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">
+                                <span class="badge bg-{% if update.update_type == 'savings_status' %}success{% elif update.update_type == 'meeting_summary' %}info{% elif update.update_type == 'reminder' %}warning{% else %}secondary{% endif %}">
+                                    {{ update.get_update_type_display }}
+                                </span>
+                                {{ update.title }}
+                            </h5>
+                            <small class="text-muted">{{ update.created_at|timesince }} ago</small>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ update.content|linebreaks }}</p>
+                        {% if update.meeting %}
+                            <p class="small text-muted">
+                                <i class="bi bi-calendar-event"></i> Related to: 
+                                <a href="{% url 'meetings:detail' update.meeting.pk %}">{{ update.meeting.title }}</a>
+                            </p>
+                        {% endif %}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="bi bi-person"></i> {{ update.created_by.username|default:"System" }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="bi bi-calendar"></i> {{ update.created_at|date:"F d, Y H:i" }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            
+            <!-- Pagination -->
+            {% if page_obj.has_other_pages %}
+                <nav aria-label="Page navigation">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if type_filter %}&type={{ type_filter }}{% endif %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if type_filter %}&type={{ type_filter }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if type_filter %}&type={{ type_filter }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if type_filter %}&type={{ type_filter }}{% endif %}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="alert alert-info text-center">
+                <i class="bi bi-info-circle"></i> No updates found.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

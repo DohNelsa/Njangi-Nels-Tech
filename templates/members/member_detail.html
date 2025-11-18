@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ member.name }} - Member Details{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-person-circle"></i> {{ member.name }}</h2>
+    </div>
+    <div class="col-md-4 text-end">
+        {% if user.is_staff or user.member_profile.is_admin %}
+            <a href="{% url 'members:edit' member.pk %}" class="btn btn-primary">
+                <i class="bi bi-pencil"></i> Edit Member
+            </a>
+        {% endif %}
+        <a href="{% url 'members:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if member.profile_picture %}
+                    <img src="{{ member.profile_picture.url }}" alt="{{ member.name }}" 
+                         class="rounded-circle mb-3" style="width: 150px; height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center mb-3" 
+                         style="width: 150px; height: 150px; font-size: 3rem;">
+                        {{ member.name|first|upper }}
+                    </div>
+                {% endif %}
+                <h4>{{ member.name }}</h4>
+                <p class="text-muted mb-2">
+                    <span class="badge bg-{% if member.role == 'leader' %}primary{% elif member.role == 'treasurer' %}success{% elif member.role == 'secretary' %}info{% else %}secondary{% endif %}">
+                        {{ member.get_role_display }}
+                    </span>
+                </p>
+                {% if member.is_active %}
+                    <span class="badge bg-success">Active</span>
+                {% else %}
+                    <span class="badge bg-danger">Inactive</span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header">
+                <h5><i class="bi bi-cash-stack"></i> Account Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Total Contributions:</strong>
+                    <span class="float-end text-success">{{ member.get_total_contributions|floatformat:2 }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Current Balance:</strong>
+                    <span class="float-end text-{% if member.get_current_balance >= 0 %}success{% else %}danger{% endif %}">
+                        {{ member.get_current_balance|floatformat:2 }}
+                    </span>
+                </div>
+                <a href="{% url 'contributions:account_balance' member.pk %}" class="btn btn-sm btn-outline-primary w-100">
+                    <i class="bi bi-eye"></i> View Account Details
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Contact Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Phone:</strong></div>
+                    <div class="col-sm-8">{{ member.phone|default:"Not provided" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Email:</strong></div>
+                    <div class="col-sm-8">{{ member.email|default:"Not provided" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Address:</strong></div>
+                    <div class="col-sm-8">{{ member.address|default:"Not provided"|linebreaks }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Date Joined:</strong></div>
+                    <div class="col-sm-8">{{ member.date_joined|date:"F d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+        
+        {% if member.notes %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5><i class="bi bi-sticky"></i> Notes</h5>
+                </div>
+                <div class="card-body">
+                    <p>{{ member.notes|linebreaks }}</p>
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-activity"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <a href="{% url 'contributions:create' %}" class="btn btn-success w-100">
+                            <i class="bi bi-plus-circle"></i> Record Contribution
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'contributions:account_balance' member.pk %}" class="btn btn-info w-100">
+                            <i class="bi bi-cash-stack"></i> View Account
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'loans:create' %}" class="btn btn-warning w-100">
+                            <i class="bi bi-bank"></i> Create Loan Request
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <a href="{% url 'contributions:withdrawal_create' %}" class="btn btn-secondary w-100">
+                            <i class="bi bi-arrow-down-circle"></i> Request Withdrawal
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

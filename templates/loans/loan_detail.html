@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan Details - {{ loan.member.name }}{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-bank"></i> Loan Details</h2>
+        <p class="text-muted">{{ loan.member.name }} - {{ loan.amount }}</p>
+    </div>
+    <div class="col-md-4 text-end">
+        {% if loan.status == 'pending' %}
+            {% if user.is_staff or user.member_profile.is_admin %}
+                <a href="{% url 'loans:approve' loan.pk %}" class="btn btn-success">
+                    <i class="bi bi-check-circle"></i> Review & Approve
+                </a>
+            {% endif %}
+        {% endif %}
+        <a href="{% url 'loans:list' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5><i class="bi bi-info-circle"></i> Loan Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Member:</strong></div>
+                    <div class="col-sm-8">
+                        <a href="{% url 'members:detail' loan.member.pk %}">{{ loan.member.name }}</a>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Loan Amount:</strong></div>
+                    <div class="col-sm-8"><strong>{{ loan.amount }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Interest Rate:</strong></div>
+                    <div class="col-sm-8">{{ loan.interest_rate }}%</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Total Amount (with interest):</strong></div>
+                    <div class="col-sm-8"><strong class="text-primary">{{ loan.get_total_amount|floatformat:2 }}</strong></div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Purpose:</strong></div>
+                    <div class="col-sm-8">{{ loan.purpose|linebreaks }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Requested Date:</strong></div>
+                    <div class="col-sm-8">{{ loan.requested_date|date:"F d, Y" }}</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Due Date:</strong></div>
+                    <div class="col-sm-8">
+                        {{ loan.due_date|date:"F d, Y" }}
+                        {% if loan.is_overdue %}
+                            <span class="badge bg-danger ms-2">Overdue</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-sm-4"><strong>Status:</strong></div>
+                    <div class="col-sm-8">
+                        <span class="badge bg-{% if loan.status == 'pending' %}warning{% elif loan.status == 'approved' or loan.status == 'active' %}success{% elif loan.status == 'completed' %}info{% elif loan.status == 'rejected' %}danger{% else %}secondary{% endif %}">
+                            {{ loan.get_status_display }}
+                        </span>
+                    </div>
+                </div>
+                {% if loan.approved_by %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Approved By:</strong></div>
+                        <div class="col-sm-8">{{ loan.approved_by.username }}</div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Approved Date:</strong></div>
+                        <div class="col-sm-8">{{ loan.approved_date|date:"F d, Y" }}</div>
+                    </div>
+                {% endif %}
+                {% if loan.notes %}
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Notes:</strong></div>
+                        <div class="col-sm-8">{{ loan.notes|linebreaks }}</div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Repayments Section -->
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Repayments</h5>
+                {% if loan.status == 'active' or loan.status == 'approved' %}
+                    <a href="{% url 'loans:repayment_create_loan' loan.pk %}" class="btn btn-sm btn-success">
+                        <i class="bi bi-plus-circle"></i> Record Repayment
+                    </a>
+                {% endif %}
+            </div>
+            <div class="card-body">
+                {% if repayments %}
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Payment Date</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Recorded By</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for repayment in repayments %}
+                                    <tr>
+                                        <td>{{ repayment.payment_date|date:"M d, Y" }}</td>
+                                        <td>{{ repayment.amount }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if repayment.status == 'completed' %}success{% else %}warning{% endif %}">
+                                                {{ repayment.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ repayment.recorded_by.username|default:"System" }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="text-muted">No repayments recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5><i class="bi bi-calculator"></i> Loan Summary</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Total Amount:</strong>
+                    <span class="float-end">{{ loan.get_total_amount|floatformat:2 }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Amount Paid:</strong>
+                    <span class="float-end text-success">{{ total_paid|floatformat:2 }}</span>
+                </div>
+                <div class="mb-3">
+                    <strong>Remaining Balance:</strong>
+                    <span class="float-end text-{% if remaining_balance > 0 %}danger{% else %}success{% endif %}">
+                        {{ remaining_balance|floatformat:2 }}
+                    </span>
+                </div>
+                <hr>
+                <div class="progress mb-3" style="height: 25px;">
+                    {% if loan.get_total_amount > 0 %}
+                        {% widthratio total_paid loan.get_total_amount 100 as payment_percentage %}
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ payment_percentage }}%">
+                            {{ payment_percentage }}%
+                        </div>
+                    {% endif %}
+                </div>
+                {% if loan.is_overdue %}
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i> This loan is overdue!
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="bi bi-lightning"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                {% if loan.status == 'active' or loan.status == 'approved' %}
+                    <a href="{% url 'loans:repayment_create_loan' loan.pk %}" class="btn btn-success w-100 mb-2">
+                        <i class="bi bi-cash-stack"></i> Record Repayment
+                    </a>
+                {% endif %}
+                <a href="{% url 'members:detail' loan.member.pk %}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="bi bi-person"></i> View Member Profile
+                </a>
+                <a href="{% url 'loans:list' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-arrow-left"></i> Back to Loans
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

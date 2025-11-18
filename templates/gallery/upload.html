@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if media_file %}Edit{% else %}Upload{% endif %} Media - Gallery{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-area {
+        border: 3px dashed #0d6efd;
+        border-radius: 10px;
+        padding: 40px;
+        text-align: center;
+        background: #f8f9fa;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    .upload-area:hover {
+        border-color: #0b5ed7;
+        background: #e7f3ff;
+    }
+    .upload-area.dragover {
+        border-color: #198754;
+        background: #d1e7dd;
+    }
+    .file-preview {
+        max-width: 100%;
+        max-height: 300px;
+        border-radius: 8px;
+        margin-top: 15px;
+    }
+    .upload-icon {
+        font-size: 4rem;
+        color: #0d6efd;
+        margin-bottom: 1rem;
+    }
+    .progress-container {
+        display: none;
+        margin-top: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h2><i class="bi bi-cloud-upload"></i> {% if media_file %}Edit Media{% else %}Upload Media{% endif %}</h2>
+        <p class="text-muted">Add new images or videos to the community gallery</p>
+    </div>
+    <div class="col-md-4 text-end">
+        <a href="{% url 'gallery:gallery' %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Gallery
+        </a>
+        <a href="{% url 'dashboard:index' %}" class="btn btn-outline-primary">
+            <i class="bi bi-speedometer2"></i> Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-arrow-up"></i> Media Upload Form</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+                    
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong><i class="bi bi-exclamation-triangle"></i> Please correct the errors below:</strong>
+                            <ul class="mb-0 mt-2">
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- File Upload Area -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-file-earmark-arrow-up"></i> Select Media File <span class="text-danger">*</span>
+                        </label>
+                        <div class="upload-area" id="upload-area" onclick="document.getElementById('id_file').click();">
+                            <i class="bi bi-cloud-upload upload-icon"></i>
+                            <h5>Drag & Drop or Click to Upload</h5>
+                            <p class="text-muted mb-0">Images: JPG, PNG, GIF, WebP | Videos: MP4, AVI, MOV, WebM</p>
+                            <p class="text-muted small">Maximum file size: 50MB</p>
+                        </div>
+                        <input type="file" name="file" id="id_file" accept="image/*,video/*" class="form-control mt-3" style="display: none;" required>
+                        <div id="file-preview" class="text-center mt-3"></div>
+                        {% if media_file and media_file.file %}
+                            <div class="alert alert-info mt-3">
+                                <i class="bi bi-info-circle"></i> Current file: <strong>{{ media_file.file.name }}</strong>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Media Type Selection -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="{{ form.media_type.id_for_label }}" class="form-label fw-bold">
+                                <i class="bi bi-file-earmark"></i> Media Type <span class="text-danger">*</span>
+                            </label>
+                            {{ form.media_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.order.id_for_label }}" class="form-label fw-bold">
+                                <i class="bi bi-sort-numeric-down"></i> Display Order
+                            </label>
+                            {{ form.order }}
+                            <small class="form-text text-muted">Lower numbers appear first in gallery</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Title and Description -->
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-card-heading"></i> Title <span class="text-danger">*</span>
+                        </label>
+                        {{ form.title }}
+                        <small class="form-text text-muted">Give your media a descriptive title</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-file-text"></i> Description
+                        </label>
+                        {{ form.description }}
+                        <small class="form-text text-muted">Optional description or caption</small>
+                    </div>
+                    
+                    <!-- Thumbnail (for videos) -->
+                    <div class="mb-3">
+                        <label for="{{ form.thumbnail.id_for_label }}" class="form-label fw-bold">
+                            <i class="bi bi-image"></i> Thumbnail (Optional)
+                        </label>
+                        {{ form.thumbnail }}
+                        <small class="form-text text-muted">Recommended for videos - helps with loading and preview</small>
+                        {% if media_file and media_file.thumbnail %}
+                            <div class="mt-2">
+                                <img src="{{ media_file.thumbnail.url }}" alt="Current thumbnail" class="file-preview">
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Active Status -->
+                    <div class="mb-3">
+                        <div class="form-check form-switch">
+                            {{ form.is_active }}
+                            <label class="form-check-label fw-bold" for="{{ form.is_active.id_for_label }}">
+                                <i class="bi bi-eye"></i> Active (visible in gallery)
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress Bar -->
+                    <div class="progress-container">
+                        <div class="progress" style="height: 25px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%" id="upload-progress">
+                                <span id="progress-text">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Submit Buttons -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <a href="{% url 'gallery:gallery' %}" class="btn btn-lg btn-secondary">
+                            <i class="bi bi-x-circle"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-lg btn-primary" id="submit-btn">
+                            <i class="bi bi-cloud-upload"></i> {% if media_file %}Update{% else %}Upload{% endif %} Media
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-info-circle"></i> Upload Guidelines</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="fw-bold">Supported Formats:</h6>
+                <ul class="small">
+                    <li><strong>Images:</strong> JPG, JPEG, PNG, GIF, WebP, BMP, SVG</li>
+                    <li><strong>Videos:</strong> MP4, AVI, MOV, WMV, FLV, WebM, MKV</li>
+                </ul>
+                
+                <hr>
+                
+                <h6 class="fw-bold">File Requirements:</h6>
+                <ul class="small">
+                    <li>Maximum file size: <strong>50MB</strong></li>
+                    <li>High quality images recommended</li>
+                    <li>Videos should be in MP4 format for best compatibility</li>
+                </ul>
+                
+                <hr>
+                
+                <h6 class="fw-bold">Tips:</h6>
+                <ul class="small">
+                    <li>Use descriptive titles for better searchability</li>
+                    <li>Add descriptions to provide context</li>
+                    <li>Upload thumbnails for videos to improve loading</li>
+                    <li>Set display order to control gallery appearance</li>
+                </ul>
+                
+                <hr>
+                
+                <div class="alert alert-warning small mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    <strong>Note:</strong> Fields marked with <span class="text-danger">*</span> are required.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card shadow-sm mt-3">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <a href="{% url 'gallery:gallery' %}" class="btn btn-outline-primary w-100 mb-2">
+                    <i class="bi bi-images"></i> View Gallery
+                </a>
+                <a href="{% url 'dashboard:index' %}" class="btn btn-outline-secondary w-100">
+                    <i class="bi bi-speedometer2"></i> Go to Dashboard
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // File upload preview
+    const fileInput = document.getElementById('id_file');
+    const uploadArea = document.getElementById('upload-area');
+    const filePreview = document.getElementById('file-preview');
+    const mediaTypeSelect = document.getElementById('id_media_type');
+    
+    // Drag and drop functionality
+    uploadArea.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadArea.classList.add('dragover');
+    });
+    
+    uploadArea.addEventListener('dragleave', () => {
+        uploadArea.classList.remove('dragover');
+    });
+    
+    uploadArea.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadArea.classList.remove('dragover');
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect();
+        }
+    });
+    
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    function handleFileSelect() {
+        const file = fileInput.files[0];
+        if (file) {
+            filePreview.innerHTML = '';
+            
+            // Auto-detect media type
+            if (file.type.startsWith('image/')) {
+                mediaTypeSelect.value = 'image';
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(file);
+                img.className = 'file-preview';
+                img.style.maxHeight = '300px';
+                filePreview.appendChild(img);
+            } else if (file.type.startsWith('video/')) {
+                mediaTypeSelect.value = 'video';
+                const video = document.createElement('video');
+                video.src = URL.createObjectURL(file);
+                video.controls = true;
+                video.className = 'file-preview';
+                video.style.maxHeight = '300px';
+                filePreview.appendChild(video);
+            }
+            
+            // Show file info
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'alert alert-info mt-2';
+            fileInfo.innerHTML = `
+                <strong>File selected:</strong> ${file.name}<br>
+                <strong>Size:</strong> ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
+                <strong>Type:</strong> ${file.type}
+            `;
+            filePreview.appendChild(fileInfo);
+        }
+    }
+    
+    // Form submission progress (simulated)
+    document.getElementById('upload-form').addEventListener('submit', function() {
+        const progressContainer = document.querySelector('.progress-container');
+        const progressBar = document.getElementById('upload-progress');
+        const progressText = document.getElementById('progress-text');
+        const submitBtn = document.getElementById('submit-btn');
+        
+        progressContainer.style.display = 'block';
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Uploading...';
+        
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            if (progress <= 90) {
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+            }
+        }, 200);
+        
+        // Clear interval when form actually submits (handled by browser)
+        setTimeout(() => clearInterval(interval), 5000);
+    });
+</script>
+{% endblock %}

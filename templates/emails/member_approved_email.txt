@@ -1,0 +1,12 @@
+Hello {{ member.name }},
+
+Great news! Your membership application for the Ngangi Platform has been approved.
+
+You can now sign in and start using the platform:
+{{ site_url }}
+
+If you have any questions, just reply to this email and an administrator will assist you.
+
+Welcome aboard,
+Ngangi Platform Team
+
