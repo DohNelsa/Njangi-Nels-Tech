@@ -1,6 +1,6 @@
-# Ngangi Platform
+# NJA PLATFORM
 
-A comprehensive Django-based online platform for managing community savings groups (ngangi). This platform facilitates member management, savings tracking, meeting management, announcements, loans, and withdrawals with role-based access control.
+A comprehensive Django-based online platform for managing community savings groups. This platform facilitates member management, savings tracking, meeting management, announcements, loans, and withdrawals with role-based access control.
 
 ## Features
 
@@ -118,11 +118,11 @@ A comprehensive Django-based online platform for managing community savings grou
 ## Project Structure
 
 ```
-ngangi_platform/
+nja_platform/
 ├── manage.py
 ├── requirements.txt
 ├── README.md
-├── ngangi_platform/
+├── nja_platform/
 │   ├── __init__.py
 │   ├── settings.py
 │   ├── urls.py
@@ -225,7 +225,7 @@ ngangi_platform/
 
 By default, the project uses SQLite. To use PostgreSQL or MySQL:
 
-1. Update `DATABASES` in `ngangi_platform/settings.py`
+1. Update `DATABASES` in `nja_platform/settings.py`
 2. Install appropriate database adapter:
    ```bash
    pip install psycopg2  # For PostgreSQL

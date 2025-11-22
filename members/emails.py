@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def _get_default_from_email() -> str:
-    return getattr(settings, "DEFAULT_FROM_EMAIL", None) or getattr(settings, "EMAIL_HOST_USER", "") or "no-reply@ngangi.local"
+    return getattr(settings, "DEFAULT_FROM_EMAIL", None) or getattr(settings, "EMAIL_HOST_USER", "") or "no-reply@nja.local"
 
 
 def send_member_approval_email(member) -> bool:
@@ -24,7 +24,7 @@ def send_member_approval_email(member) -> bool:
         "member": member,
         "site_url": getattr(settings, "SITE_URL", "http://127.0.0.1:8000"),
     }
-    subject = "Your Ngangi Platform membership has been approved"
+    subject = "Your NJA PLATFORM membership has been approved"
     text_body = render_to_string("emails/member_approved_email.txt", context)
     html_body = render_to_string("emails/member_approved_email.html", context)
 
@@ -74,5 +74,6 @@ def send_group_notification_email(subject: str, message: str, members: Iterable)
     except Exception as exc:  # pragma: no cover
         logger.exception("Failed to send group notification email: %s", exc)
         return 0
+
 
 

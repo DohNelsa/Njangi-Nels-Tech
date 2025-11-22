@@ -1,5 +1,5 @@
 """
-Setup script for Ngangi Platform
+Setup script for NJA PLATFORM
 Run this script to initialize the project
 """
 
@@ -22,7 +22,7 @@ def run_command(command):
 
 def main():
     print("=" * 60)
-    print("Ngangi Platform Setup")
+    print("NJA PLATFORM Setup")
     print("=" * 60)
     print()
     

@@ -1,5 +1,5 @@
 """
-Django settings for ngangi_platform project.
+Django settings for nja_platform project.
 """
 
 from pathlib import Path
@@ -52,7 +52,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'ngangi_platform.urls'
+ROOT_URLCONF = 'nja_platform.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +70,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'ngangi_platform.wsgi.application'
+WSGI_APPLICATION = 'nja_platform.wsgi.application'
 
 
 # Database
@@ -145,15 +145,15 @@ SESSION_COOKIE_AGE = 86400  # 24 hours
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Email configuration (override with environment variables in production)
-EMAIL_BACKEND = os.environ.get('NGANGI_EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
-EMAIL_HOST = os.environ.get('NGANGI_EMAIL_HOST', '')
-EMAIL_PORT = int(os.environ.get('NGANGI_EMAIL_PORT', '587'))
-EMAIL_HOST_USER = os.environ.get('NGANGI_EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('NGANGI_EMAIL_HOST_PASSWORD', '')
-EMAIL_USE_TLS = os.environ.get('NGANGI_EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
-EMAIL_USE_SSL = os.environ.get('NGANGI_EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
-DEFAULT_FROM_EMAIL = os.environ.get('NGANGI_DEFAULT_FROM_EMAIL', 'no-reply@ngangi.local')
+EMAIL_BACKEND = os.environ.get('NJA_EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
+EMAIL_HOST = os.environ.get('NJA_EMAIL_HOST', '')
+EMAIL_PORT = int(os.environ.get('NJA_EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('NJA_EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('NJA_EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('NJA_EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_USE_SSL = os.environ.get('NJA_EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
+DEFAULT_FROM_EMAIL = os.environ.get('NJA_DEFAULT_FROM_EMAIL', 'no-reply@nja.local')
 
-SITE_URL = os.environ.get('NGANGI_SITE_URL', 'http://127.0.0.1:8000')
+SITE_URL = os.environ.get('NJA_SITE_URL', 'http://127.0.0.1:8000')
 
 

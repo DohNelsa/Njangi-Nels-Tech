@@ -1,6 +1,6 @@
 Hello {{ member.name }},
 
-Great news! Your membership application for the Ngangi Platform has been approved.
+Great news! Your membership application for the NJA PLATFORM has been approved.
 
 You can now sign in and start using the platform:
 {{ site_url }}
@@ -8,5 +8,6 @@ You can now sign in and start using the platform:
 If you have any questions, just reply to this email and an administrator will assist you.
 
 Welcome aboard,
-Ngangi Platform Team
+NJA PLATFORM Team
+
 

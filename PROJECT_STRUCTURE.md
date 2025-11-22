@@ -1,7 +1,7 @@
-# Ngangi Platform - Project Structure
+# NJA PLATFORM - Project Structure
 
 ## Overview
-Complete Django-based online platform for managing community savings groups (ngangi) with all requested features.
+Complete Django-based online platform for managing community savings groups with all requested features.
 
 ## Project Structure
 
@@ -12,7 +12,7 @@ Complete Django-based online platform for managing community savings groups (nga
 - `.gitignore` - Git ignore rules
 - `setup.py` - Setup automation script
 
-### Main Project Configuration (`ngangi_platform/`)
+### Main Project Configuration (`nja_platform/`)
 - `settings.py` - Django settings with all apps configured
 - `urls.py` - Main URL routing
 - `wsgi.py` / `asgi.py` - WSGI/ASGI configuration

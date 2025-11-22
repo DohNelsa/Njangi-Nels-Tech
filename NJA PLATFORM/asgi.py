@@ -1,5 +1,5 @@
 """
-ASGI config for ngangi_platform project.
+ASGI config for nja_platform project.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 
@@ -11,7 +11,7 @@ import os
 
 from django.core.asgi import get_asgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'ngangi_platform.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'nja_platform.settings')
 
 application = get_asgi_application()
 

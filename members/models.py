@@ -12,7 +12,7 @@ ROLE_CHOICES = [
 
 
 class Member(models.Model):
-    """Member model for ngangi platform"""
+    """Member model for NJA PLATFORM"""
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='member_profile', null=True, blank=True)
     name = models.CharField(max_length=200)
     phone_regex = RegexValidator(
