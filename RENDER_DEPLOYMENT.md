@@ -111,10 +111,38 @@ After successful deployment, you need to create an admin user:
 
 ## Troubleshooting
 
-### Build Fails
+### Build Fails with "Could not open requirements file"
+**This is the most common error!** It means Render can't find `requirements.txt`. Solutions:
+
+1. **Verify files are committed and pushed:**
+   ```bash
+   git status
+   git add requirements.txt Procfile build.sh
+   git commit -m "Add deployment files"
+   git push origin main
+   ```
+
+2. **Check Root Directory in Render:**
+   - Go to your Web Service settings in Render
+   - Scroll to **"Root Directory"**
+   - **Leave it EMPTY** (or set to `.` if your Django app is in the repo root)
+   - If your Django app is in a subdirectory, set Root Directory to that subdirectory
+
+3. **Verify file location:**
+   - `requirements.txt` must be in the same directory as `manage.py`
+   - `Procfile` must be in the same directory as `manage.py`
+   - `build.sh` must be in the same directory as `manage.py`
+
+4. **Check build logs:**
+   - Look at the build logs in Render dashboard
+   - The error will show which directory Render is looking in
+   - Compare with where your files actually are
+
+### Build Fails (Other Issues)
 - Check build logs in Render dashboard
 - Ensure `requirements.txt` is in the root directory
 - Verify `build.sh` has execute permissions (Render handles this)
+- Make sure all files are committed to git and pushed to your repository
 
 ### Static Files Not Loading
 - Ensure `collectstatic` ran during build (check build logs)

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: nja-platform
+    env: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn nja_platform.wsgi
+    envVars:
+      - key: SECRET_KEY
+        sync: false
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+    database:
+      name: nja-platform-db
+      plan: free
+
