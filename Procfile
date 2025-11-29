@@ -1,2 +1,2 @@
-web: gunicorn nja_platform.wsgi
+web: bash start.sh
 
