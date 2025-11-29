@@ -1,26 +1,14 @@
-# Django Core
 Django==5.1.7
 asgiref==3.8.1
 sqlparse==0.5.3
-
-# Forms
 django-crispy-forms==2.3
 crispy-bootstrap5==2024.2
-
-# File Handling
 Pillow==10.4.0
 openpyxl==3.1.5
 reportlab==4.3.1
-
-# Production Server
 gunicorn==21.2.0
-
-# Static Files (Production)
 whitenoise==6.11.0
-
-# Database (for PostgreSQL on Render)
 psycopg2-binary==2.9.9
-
-# Environment Variables
 python-dotenv==1.1.1
 dj-database-url==2.1.0
+
