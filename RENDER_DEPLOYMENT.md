@@ -46,10 +46,10 @@ git push origin main
 - **Name**: `nja-platform` (or your preferred name)
 - **Region**: Choose closest to your users
 - **Branch**: `main` (or your default branch)
-- **Root Directory**: Leave empty (or set if your Django app is in a subdirectory)
+- **Root Directory**: **Leave EMPTY** (this is critical!)
 - **Runtime**: `Python 3`
 - **Build Command**: `./build.sh`
-- **Start Command**: `gunicorn nja_platform.wsgi`
+- **Start Command**: `bash start.sh` (or `gunicorn nja_platform.wsgi` if you prefer)
 
 #### Environment Variables:
 Click **"Advanced"** → **"Add Environment Variable"** and add:
@@ -117,7 +117,7 @@ After successful deployment, you need to create an admin user:
 1. **Verify files are committed and pushed:**
    ```bash
    git status
-   git add requirements.txt Procfile build.sh
+   git add requirements.txt Procfile build.sh start.sh
    git commit -m "Add deployment files"
    git push origin main
    ```
@@ -125,18 +125,53 @@ After successful deployment, you need to create an admin user:
 2. **Check Root Directory in Render:**
    - Go to your Web Service settings in Render
    - Scroll to **"Root Directory"**
-   - **Leave it EMPTY** (or set to `.` if your Django app is in the repo root)
-   - If your Django app is in a subdirectory, set Root Directory to that subdirectory
+   - **CRITICAL: Leave it EMPTY** (do NOT set it to anything)
+   - Your Django app is in the repo root, so Root Directory must be empty
 
 3. **Verify file location:**
    - `requirements.txt` must be in the same directory as `manage.py`
    - `Procfile` must be in the same directory as `manage.py`
    - `build.sh` must be in the same directory as `manage.py`
+   - `start.sh` must be in the same directory as `manage.py`
 
 4. **Check build logs:**
    - Look at the build logs in Render dashboard
    - The error will show which directory Render is looking in
    - Compare with where your files actually are
+
+### Build Fails with "Exited with status 1"
+**If build fails with status 1, check the build logs for the specific error:**
+
+1. **View Build Logs:**
+   - In Render dashboard, go to your Web Service
+   - Click on the failed deployment
+   - Scroll through the build logs to find the exact error
+
+2. **Common Build Errors:**
+
+   **a) "collectstatic failed":**
+   - Check that `STATIC_ROOT` is set in `settings.py`
+   - Verify WhiteNoise is in `MIDDLEWARE`
+   - Check build logs for specific collectstatic error
+
+   **b) "migrations failed":**
+   - This is OK! Migrations will run at startup
+   - The build script allows migrations to fail during build
+   - Make sure database is linked to your web service
+
+   **c) "Module not found" or "Import error":**
+   - Check that all dependencies are in `requirements.txt`
+   - Verify Python version matches (Render uses Python 3.12 by default)
+
+   **d) "Permission denied" on build.sh:**
+   - Render should handle this automatically
+   - If it persists, the script should have execute permissions
+
+3. **If build still fails:**
+   - Copy the exact error message from build logs
+   - Check that all files are in the repository root
+   - Verify Root Directory is empty in Render settings
+   - Make sure you're deploying from the correct branch
 
 ### Build Fails (Other Issues)
 - Check build logs in Render dashboard
