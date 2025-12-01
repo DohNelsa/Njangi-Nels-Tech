@@ -7,16 +7,38 @@ echo "=========================================="
 echo "Starting build process..."
 echo "=========================================="
 
+# Debug: Show current directory and files
+echo "Current directory: $(pwd)"
+echo "Files in current directory:"
+ls -la
+echo ""
+
+# Check if we're in the right directory
+if [ ! -f "manage.py" ]; then
+    echo "ERROR: manage.py not found in current directory!"
+    echo "Current directory: $(pwd)"
+    exit 1
+fi
+
+# Check for requirements.txt
+if [ ! -f "requirements.txt" ]; then
+    echo "ERROR: requirements.txt not found!"
+    echo "Current directory: $(pwd)"
+    echo "Looking for requirements.txt in: $(pwd)/requirements.txt"
+    echo "Files in directory:"
+    ls -la
+    exit 1
+fi
+
+echo "✓ Found requirements.txt"
+echo ""
+
 # Upgrade pip
 echo "Step 1: Upgrading pip..."
 pip install --upgrade pip || echo "Warning: pip upgrade failed, continuing..."
 
 # Install dependencies
 echo "Step 2: Installing dependencies from requirements.txt..."
-if [ ! -f "requirements.txt" ]; then
-    echo "ERROR: requirements.txt not found!"
-    exit 1
-fi
 pip install -r requirements.txt
 
 # Verify Django installation
