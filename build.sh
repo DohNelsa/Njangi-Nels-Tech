@@ -15,21 +15,17 @@ echo ""
 # Upgrade pip
 pip install --upgrade pip
 
-# Install dependencies directly (no requirements.txt needed)
-echo "Installing dependencies..."
-pip install Django==5.1.7
-pip install asgiref==3.8.1
-pip install sqlparse==0.5.3
-pip install django-crispy-forms==2.3
-pip install crispy-bootstrap5==2024.2
-pip install Pillow==10.4.0
-pip install openpyxl==3.1.5
-pip install reportlab==4.3.1
-pip install gunicorn==21.2.0
-pip install whitenoise==6.11.0
-pip install psycopg2-binary==2.9.9
-pip install python-dotenv==1.1.1
-pip install dj-database-url==2.1.0
+# Install dependencies from requirements.txt
+echo "Installing dependencies from requirements.txt..."
+if [ -f "requirements.txt" ]; then
+    pip install -r requirements.txt
+else
+    echo "ERROR: requirements.txt not found!"
+    echo "Current directory: $(pwd)"
+    echo "Files:"
+    ls -la
+    exit 1
+fi
 
 # Verify Django
 python -c "import django; print('Django OK')"
